@@ -44,7 +44,7 @@ fastrfw/
 
 # Dependancies: 
 
-	- CLAP: for cli parsing
+	- CLAP: for cli parsing ----> take a look to native parsing solution: https://rust-cli.github.io/book/tutorial/cli-args.html
 	- Libc or syscall for socket Netlink manipulaitons
 
 # Description of the choice of the syscall queue:
