@@ -20,7 +20,7 @@ enum Action {
 #[command(
     name = "FastRFW",
     version = "1.0",
-    about = "A basic educational firewall using Netfilter Queues",
+    about = "Basic and lightweght cli firewall using Netfilter Queues",
     long_about = None
 )]
 struct Args {
@@ -69,5 +69,5 @@ fn main() {
         println!("   Priority  : {:?}", args.priority.unwrap_or(0));
         println!("   Target    : {:?}", args.target.unwrap_or_else(|| "any".to_string()));
     } else {
-        println!("❌ Error: Missing core arguments. Use -h for help.");
+        println!("Error: Missing arguments. Use -h for help.");
     }
