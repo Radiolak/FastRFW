@@ -1,73 +1,40 @@
-use clap::{Parser, ValueEnum};
+// module de la bibliothèque standard pour utiliser args ici tel que std::env::args
+use std::env;
 
-// 1. Définition des énumérations pour typer fortement les choix de l'utilisateur
 
-#[derive(ValueEnum, Clone, Debug)]
-enum Direction {
-    In,
-    Out,
+struct ArgsStruct  {
+    direction: String, // -d [IN/OUT]
+    action: String,    // -a [ADD/REMOVE]
+    protocol: String,  // -p [protocol]
+    priority: String,  // -c [priority]
+    target: String,    // -t [IP / PORT]
 }
 
-#[derive(ValueEnum, Clone, Debug)]
-enum Action {
-    Add,
-    Remove,
-}
+// déclaration de la fonction argparse, -> sert à déclarer le retour de la fonction
+fn argparse() -> ArgsStruct  {
 
-// 2. Définition de la structure des arguments attendus par FastRFW
-
-#[derive(Parser, Debug)]
-#[command(
-    name = "FastRFW",
-    version = "1.0",
-    about = "Basic and lightweght cli firewall using Netfilter Queues",
-    long_about = None
-)]
-struct Args {
-    /// Direction of the network traffic [IN/OUT]
-    #[arg(short = 'd', value_enum)]
-    direction: Option<Direction>,
-
-    /// Action to perform [ADD/REMOVE]
-    #[arg(short = 'a', value_enum)]
-    action: Option<Action>,
-
-    /// Network protocol (e.g., tcp, udp, icmp, all)
-    #[arg(short = 'p')]
-    protocol: Option<String>,
-
-    /// Priority/Weight of the rule
-    #[arg(short = 'c')]
-    priority: Option<u32>,
-
-    /// Target IP address or Port number
-    #[arg(short = 't')]
-    target: Option<String>,
-
-    /// Get current active filters
-    #[arg(short = 'i', action = clap::ArgAction::SetTrue)]
-    get_filters: bool,
+    let args: Vec<String> = env::args().collect();
+    
+    if args.len() != 6 {
+        println!("Erreur : Nombre d'arguments incorrect !");
+        println!("Usage   : fastrfw [IN/OUT] [ADD/REMOVE] [protocol] [priority] [IP/PORT]");
+        println!("Exemple : fastrfw IN ADD tcp 10 192.168.1.50");
+        std::process::exit(1);
+    }
+    
+    ArgsStruct  {
+        direction: args[1].clone(),
+        action: args[2].clone(),
+        protocol: args[3].clone(),
+        priority: args[4].clone(),
+        target: args[5].clone(),
+    }
 }
 
 fn main() {
-    // Analyse (parse) les arguments de la ligne de commande
-    let args = Args::parse();
+    let arguments = argparse();
 
-    // Gestion de la commande d'affichage des filtres : fastrfw -i
-    if args.get_filters {
-        println!("[-] Fetching and displaying active filters...");
-        return;
-    }
-
-    // Validation minimale pour s'assurer que si l'utilisateur n'utilise pas -i,
-    // il fournit au moins les arguments principaux pour configurer une règle.
-    if let (Some(dir), Some(act)) = (args.direction, args.action) {
-        println!("🔧 Action detected:");
-        println!("   Direction : {:?}", dir);
-        println!("   Action    : {:?}", act);
-        println!("   Protocol  : {:?}", args.protocol.unwrap_or_else(|| "all".to_string()));
-        println!("   Priority  : {:?}", args.priority.unwrap_or(0));
-        println!("   Target    : {:?}", args.target.unwrap_or_else(|| "any".to_string()));
-    } else {
-        println!("Error: Missing arguments. Use -h for help.");
-    }
+    println!("Variables : {} {} {} {} {}", 
+        arguments.direction, arguments.action, arguments.protocol, arguments.priority, arguments.target
+    );
+}
